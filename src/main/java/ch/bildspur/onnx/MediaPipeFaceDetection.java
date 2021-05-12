@@ -1,19 +1,17 @@
 package ch.bildspur.onnx;
 
 import ai.onnxruntime.*;
-import processing.core.PConstants;
 import processing.core.PImage;
 
 import java.util.Collections;
 
-public class Midas {
+public class MediaPipeFaceDetection {
+
     private OrtEnvironment env = OrtEnvironment.getEnvironment();
     private OrtSession.SessionOptions opts = new OrtSession.SessionOptions();
     private OrtSession session;
 
-    PImage result = new PImage(256, 256, PConstants.RGB);
-
-    public Midas(String modelPath) {
+    public MediaPipeFaceDetection(String modelPath) {
         try {
             opts.setOptimizationLevel(OrtSession.SessionOptions.OptLevel.BASIC_OPT);
             session = env.createSession(modelPath, opts);
@@ -26,6 +24,7 @@ public class Midas {
             System.out.println("Outputs:");
             for (NodeInfo i : session.getOutputInfo().values()) {
                 System.out.println(i.toString());
+                System.out.println(i.getName());
             }
 
         } catch (OrtException e) {
@@ -33,33 +32,19 @@ public class Midas {
         }
     }
 
-    public PImage predict(PImage image) {
-        float[][][][] inputData = new float[1][3][256][256];
+    public void predict(PImage image) {
+        float[][][][] inputData = new float[1][256][256][3];
         imageToTensor(image, inputData);
 
         try {
             OnnxTensor test = OnnxTensor.createTensor(env, inputData);
-            OrtSession.Result output = session.run(Collections.singletonMap("0", test));
+            OrtSession.Result output = session.run(Collections.singletonMap("Identity:0", test));
 
             // get first output
-            float[][][] data = (float[][][]) output.get(0).getValue();
-            tensorToImage(data, result);
+            float[][][] identity = (float[][][]) output.get(0).getValue();
+            System.out.println("data");
         } catch (OrtException e) {
             e.printStackTrace();
-        }
-
-        return result;
-    }
-
-    private void tensorToImage(float[][][] tensor, PImage image) {
-        for(int y = 0; y < image.height; y++) {
-            for (int x = 0; x < image.width; x++) {
-                float value = tensor[0][y][x];
-                int loc = x + y * image.width;
-
-                // todo: use another scale
-                image.pixels[loc] = (int)Math.round(value / 1000.0 * 255);
-            }
         }
     }
 
@@ -70,17 +55,18 @@ public class Midas {
 
         int[] pixels = input.pixels;
 
-        for(int y = 0; y < input.height; y++) {
-            for(int x = 0; x < input.width; x++) {
+        for (int y = 0; y < input.height; y++) {
+            for (int x = 0; x < input.width; x++) {
                 int loc = x + y * input.width;
                 int pixel = pixels[loc];
 
                 // extract R G B
                 // todo: check if it should be BGR
-                tensor[0][0][y][x] = pixel & 0xFF;
-                tensor[0][1][y][x] = pixel >> 8 & 0xFF;
-                tensor[0][2][y][x] = pixel >> 16 & 0xFF;
+                tensor[0][y][x][0] = pixel & 0xFF;
+                tensor[0][y][x][1] = pixel >> 8 & 0xFF;
+                tensor[0][y][x][2] = pixel >> 16 & 0xFF;
             }
         }
     }
+
 }
