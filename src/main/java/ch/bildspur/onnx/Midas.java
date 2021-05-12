@@ -1,6 +1,7 @@
 package ch.bildspur.onnx;
 
 import ai.onnxruntime.*;
+import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PImage;
 
@@ -52,13 +53,24 @@ public class Midas {
     }
 
     private void tensorToImage(float[][][] tensor, PImage image) {
+        float minValue = Float.MAX_VALUE;
+        float maxValue = Float.MIN_VALUE;
+
+        for(int y = 0; y < image.height; y++) {
+            for (int x = 0; x < image.width; x++) {
+                float value = tensor[0][y][x];
+                if (value < minValue) minValue = value;
+                if (value > maxValue) maxValue = value;
+            }
+        }
+
         for(int y = 0; y < image.height; y++) {
             for (int x = 0; x < image.width; x++) {
                 float value = tensor[0][y][x];
                 int loc = x + y * image.width;
 
-                // todo: use another scale
-                image.pixels[loc] = (int)Math.round(value / 1000.0 * 255);
+                float c = PApplet.map(value, minValue, maxValue, 0, 255);
+                image.pixels[loc] = Math.round(c);
             }
         }
     }

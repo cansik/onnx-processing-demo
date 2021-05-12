@@ -57,6 +57,8 @@ public class MediaPipeFaceDetection {
                 if (score >= threshold) {
                     int ptr = 0;
 
+                    // post process anchors
+
                     // create new result
                     FaceDetection result = new FaceDetection();
                     result.score = score;
