@@ -1,0 +1,34 @@
+plugins {
+    id 'java'
+}
+
+group 'ch.bildspur'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    processing
+    compile.extendsFrom processing
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+
+    // onnx
+    implementation 'com.microsoft.onnxruntime:onnxruntime:1.7.0'
+
+    // processing
+    processing group: 'org.processing', name: 'core', version: '3.3.7'
+    processing group: 'org.jogamp.jogl', name: 'jogl-all-main', version: '2.3.2'
+    processing group: 'org.jogamp.gluegen', name: 'gluegen-rt-main', version: '2.3.2'
+}
+
+test {
+    useJUnitPlatform()
+}
