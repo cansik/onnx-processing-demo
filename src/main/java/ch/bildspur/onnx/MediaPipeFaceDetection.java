@@ -2,14 +2,19 @@ package ch.bildspur.onnx;
 
 import ai.onnxruntime.*;
 import processing.core.PImage;
+import processing.core.PVector;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class MediaPipeFaceDetection {
 
     private OrtEnvironment env = OrtEnvironment.getEnvironment();
     private OrtSession.SessionOptions opts = new OrtSession.SessionOptions();
     private OrtSession session;
+
+    private float threshold = 0.5f;
 
     public MediaPipeFaceDetection(String modelPath) {
         try {
@@ -24,7 +29,6 @@ public class MediaPipeFaceDetection {
             System.out.println("Outputs:");
             for (NodeInfo i : session.getOutputInfo().values()) {
                 System.out.println(i.toString());
-                System.out.println(i.getName());
             }
 
         } catch (OrtException e) {
@@ -32,20 +36,41 @@ public class MediaPipeFaceDetection {
         }
     }
 
-    public void predict(PImage image) {
+    public List<FaceDetection> predict(PImage image) {
+        List<FaceDetection> results = new ArrayList<>();
         float[][][][] inputData = new float[1][256][256][3];
         imageToTensor(image, inputData);
 
         try {
             OnnxTensor test = OnnxTensor.createTensor(env, inputData);
-            OrtSession.Result output = session.run(Collections.singletonMap("Identity:0", test));
+            OrtSession.Result output = session.run(Collections.singletonMap("input:0", test));
 
-            // get first output
-            float[][][] identity = (float[][][]) output.get(0).getValue();
-            System.out.println("data");
+            // get outputs
+            float[][][] scores1 = (float[][][]) output.get(0).getValue(); // 512
+            float[][][] scores2 = (float[][][]) output.get(1).getValue(); // 384
+            float[][][] boxes1 = (float[][][]) output.get(2).getValue(); // 512
+            float[][][] boxes2 = (float[][][]) output.get(3).getValue(); // 384
+
+            // analyse score
+            for (int i = 0; i < scores1[0].length; i++) {
+                float score = scores1[0][i][0];
+                if (score >= threshold) {
+                    int ptr = 0;
+
+                    // create new result
+                    FaceDetection result = new FaceDetection();
+                    result.score = score;
+                    result.center = new PVector(boxes1[0][i][ptr++], boxes1[0][i][ptr++]);
+
+                    results.add(result);
+                }
+            }
+
         } catch (OrtException e) {
             e.printStackTrace();
         }
+
+        return results;
     }
 
     private void imageToTensor(PImage image, float[][][][] tensor) {
@@ -61,12 +86,18 @@ public class MediaPipeFaceDetection {
                 int pixel = pixels[loc];
 
                 // extract R G B
-                // todo: check if it should be BGR
-                tensor[0][y][x][0] = pixel & 0xFF;
-                tensor[0][y][x][1] = pixel >> 8 & 0xFF;
-                tensor[0][y][x][2] = pixel >> 16 & 0xFF;
+                tensor[0][y][x][0] = (pixel >> 16) & 0xff;
+                tensor[0][y][x][1] = (pixel >> 8) & 0xff;
+                tensor[0][y][x][2] = (pixel) & 0xff;
             }
         }
     }
 
+    public float getThreshold() {
+        return threshold;
+    }
+
+    public void setThreshold(float threshold) {
+        this.threshold = threshold;
+    }
 }

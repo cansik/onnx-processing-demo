@@ -75,8 +75,8 @@ public class Midas {
                 int loc = x + y * input.width;
                 int pixel = pixels[loc];
 
-                // extract R G B
-                // todo: check if it should be BGR
+                // extract B G R
+                // todo: maybe RGB?
                 tensor[0][0][y][x] = pixel & 0xFF;
                 tensor[0][1][y][x] = pixel >> 8 & 0xFF;
                 tensor[0][2][y][x] = pixel >> 16 & 0xFF;
