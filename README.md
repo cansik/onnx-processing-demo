@@ -1,6 +1,19 @@
 # ONNX Processing Demo
-A simple demo on how to run ONNX models in processing.
+A simple demo on how to run ONNX vision models in processing.
+
+### Experiments
+
+️🌿 = Implemented
+🔥 = In Progress
+
+
+- [Intel Midas](https://github.com/intel-isl/MiDaS) ️🌿
+- [MediaPipe BlazeFace](https://github.com/intel-isl/MiDaS) 🔥
 
 ### Prepare
 
-https://github.com/intel-isl/MiDaS/releases/download/v2_1/model-small.onnx
+Please download the models first:
+
+```bash
+sh download-models.sh
+```
