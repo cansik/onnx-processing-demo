@@ -77,9 +77,9 @@ public class Midas {
 
                 // extract B G R
                 // todo: maybe RGB?
-                tensor[0][0][y][x] = pixel & 0xFF;
-                tensor[0][1][y][x] = pixel >> 8 & 0xFF;
-                tensor[0][2][y][x] = pixel >> 16 & 0xFF;
+                tensor[0][0][y][x] = (pixel & 0xFF) / 255.0f;
+                tensor[0][1][y][x] = (pixel >> 8 & 0xFF) / 255.0f;
+                tensor[0][2][y][x] = (pixel >> 16 & 0xFF) / 255.0f;
             }
         }
     }

@@ -86,9 +86,9 @@ public class MediaPipeFaceDetection {
                 int pixel = pixels[loc];
 
                 // extract R G B
-                tensor[0][y][x][0] = (pixel >> 16) & 0xff;
-                tensor[0][y][x][1] = (pixel >> 8) & 0xff;
-                tensor[0][y][x][2] = (pixel) & 0xff;
+                tensor[0][y][x][0] = ((pixel >> 16) & 0xff) / 255.0f;
+                tensor[0][y][x][1] = ((pixel >> 8) & 0xff) / 255.0f;
+                tensor[0][y][x][2] = ((pixel) & 0xff) / 255.0f;
             }
         }
     }

@@ -38,9 +38,10 @@ public class FaceDetection extends PApplet {
         image(input, 0, 0);
 
         for(ch.bildspur.onnx.FaceDetection detection : results) {
-            stroke(255, 0, 0);
+            stroke(0, 80, 100);
+            strokeWeight(2f);
             noFill();
-            ellipse(detection.center.x, detection.center.y, 50, 50);
+            ellipse(detection.center.x * width, detection.center.y * height, 20, 20);
         }
 
         surface.setTitle("Face Detection - FPS: " + Math.round(frameRate));
