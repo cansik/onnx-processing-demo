@@ -69,8 +69,8 @@ public class Midas {
                 float value = tensor[0][y][x];
                 int loc = x + y * image.width;
 
-                float c = PApplet.map(value, minValue, maxValue, 0, 255);
-                image.pixels[loc] = Math.round(c);
+                int c = Math.round(PApplet.map(value, minValue, maxValue, 0, 255));
+                image.pixels[loc] = c << 16 | c << 8 | c;
             }
         }
     }
