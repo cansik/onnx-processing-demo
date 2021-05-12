@@ -6,7 +6,7 @@ A simple demo on how to run ONNX vision models in processing.
 ️🌿 = Implemented, 🔥 = In Progress
 
 - [Intel Midas](https://github.com/intel-isl/MiDaS) ️🌿
-- [MediaPipe BlazeFace](https://github.com/intel-isl/MiDaS) 🔥
+- [MediaPipe BlazeFace](https://google.github.io/mediapipe/solutions/face_detection.html) 🔥
 
 ### Prepare
 
